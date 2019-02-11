@@ -39,6 +39,12 @@ You're reading it!
 
 ![alt text](images/01_voxel_DownSample_0.005.PNG)
 
+![alt text](images/02_pass through filter.PNG)
+
+![alt text](images/03_RANSAC_Extracting_inliers.PNG)
+
+![alt text](images/04_RANSAC_Extracting_outliers.PNG)
+
 #### 2. Complete Exercise 2 steps: Pipeline including clustering for segmentation implemented.  
 
 #### 2. Complete Exercise 3 Steps.  Features extracted and SVM trained.  Object recognition implemented.
