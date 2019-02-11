@@ -39,7 +39,7 @@ You're reading it!
 
 ![alt text](images/01_voxel_DownSample_0.005.PNG)
 
-![alt text](images/01_voxel_DownSample_0.005.PNG)
+![alt text](images/02_pass through filter.PNG)
 
 ![alt text](images/03_RANSAC_Extracting_inliers.PNG)
 
