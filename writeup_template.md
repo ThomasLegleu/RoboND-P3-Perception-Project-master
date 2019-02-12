@@ -90,7 +90,7 @@ You're reading it!
     filename = 'pass_through_filtered.pcd'
     pcl.save(cloud_filtered, filename)
 
-#### c- RANSAC plane segmentation
+#### c- RANSAC plane segmentation // Extract inliers
 
 ![alt text](images/03_RANSAC_Extracting_inliers.PNG)
 
@@ -111,8 +111,6 @@ You're reading it!
     # Call the segment function to obtain set of inlier indices and model coefficients
     inliers, coefficients = seg.segment()
 
-#### d-Extract inliers
-
     extracted_inliers = cloud_filtered.extract(inliers, negative=False)
     filename = 'extracted_inliers.pcd'
     pcl.save(extracted_inliers, filename)
@@ -120,7 +118,7 @@ You're reading it!
     # Save pcd for table
     #pcl.save(cloud, filename)
 
-#### e-Extract outliers
+#### d-Extract outliers
 
 ![alt text](images/04_RANSAC_Extracting_outliers.PNG)
     
