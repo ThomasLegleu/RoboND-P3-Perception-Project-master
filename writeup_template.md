@@ -47,9 +47,10 @@ You're reading it!
 
     cloud = pcl.load_XYZRGB('tabletop.pcd')
 
+#### a- Voxel Grid filter
+
 ![alt text](images/01_voxel_DownSample_0.005.PNG)
 
-    # Voxel Grid filter
 
     # Create a VoxelGrid filter object for our input point cloud
     vox = cloud.make_voxel_grid_filter()
@@ -68,10 +69,10 @@ You're reading it!
     pcl.save(cloud_filtered, filename)
 
 
+#### b- PassThrough filter
+
 ![alt text](images/02_pass_throughfilter.PNG)
 
-
-    # PassThrough filter
 
     # PassThrough filter
     # Create a PassThrough filter object.
@@ -89,11 +90,11 @@ You're reading it!
     filename = 'pass_through_filtered.pcd'
     pcl.save(cloud_filtered, filename)
 
+#### c- RANSAC plane segmentation
 
 ![alt text](images/03_RANSAC_Extracting_inliers.PNG)
 
 
-    # RANSAC plane segmentation
     # Create the segmentation object
     seg = cloud_filtered.make_segmenter()
 
@@ -110,7 +111,8 @@ You're reading it!
     # Call the segment function to obtain set of inlier indices and model coefficients
     inliers, coefficients = seg.segment()
 
-    # Extract inliers
+#### d-Extract inliers
+
     extracted_inliers = cloud_filtered.extract(inliers, negative=False)
     filename = 'extracted_inliers.pcd'
     pcl.save(extracted_inliers, filename)
@@ -118,17 +120,18 @@ You're reading it!
     # Save pcd for table
     #pcl.save(cloud, filename)
 
+#### e-Extract outliers
 
 ![alt text](images/04_RANSAC_Extracting_outliers.PNG)
-
-
-    # Extract outliers
+    
     extracted_outliers = cloud_filtered.extract(inliers, negative=True)
     filename = 'extracted_outliers.pcd'
     pcl.save(extracted_outliers, filename)
     
 
 #### 2. Complete Exercise 2 steps: Pipeline including clustering for segmentation implemented.  
+
+
 
 #### 2. Complete Exercise 3 Steps.  Features extracted and SVM trained.  Object recognition implemented.
 Here is an example of how to include an image in your writeup.
