@@ -35,16 +35,17 @@
 You're reading it!
 
 ### Exercise 1, 2 and 3 pipeline implemented
+
+
 #### 1. Complete Exercise 1 steps. Pipeline for filtering and RANSAC plane fitting implemented.
 
+#### Import PCL module
 
+    import pcl
 
+#### Load Point Cloud file
 
-# Import PCL module
-import pcl
-
-# Load Point Cloud file
-cloud = pcl.load_XYZRGB('tabletop.pcd')
+    cloud = pcl.load_XYZRGB('tabletop.pcd')
 
 ![alt text](images/01_voxel_DownSample_0.005.PNG)
 
