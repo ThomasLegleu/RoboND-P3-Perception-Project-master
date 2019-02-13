@@ -207,8 +207,11 @@ Euclidean Clustering
     ec.set_MinClusterSize(10)
     ec.set_MaxClusterSize(2500)
 
+
+
     # Search the k-d tree for clusters
     ec.set_SearchMethod(tree)
+    
     # Extract indices for each of the discovered clusters
     cluster_indices = ec.Extract()
 
@@ -226,6 +229,9 @@ Euclidean Clustering
     #Create new cloud containing all clusters, each with unique color
     cluster_cloud = pcl.PointCloud_PointXYZRGB()
     cluster_cloud.from_list(color_cluster_point_list)
+
+
+    ros_cluster_cloud = pcl_to_ros(cluster_cloud)
 
 ![alt text](images/08_clustered_cloud.PNG)
 
