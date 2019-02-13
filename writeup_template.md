@@ -131,7 +131,7 @@ You're reading it!
 
 The goal is to write a ROS node that takes in the camera data as a point cloud, filters that point cloud, then segments the individual objects using Euclidean clustering
 
-A- publish the point cloud:
+#### A- publish the point cloud:
 
 Next, make the following changes to the script:
 
@@ -162,7 +162,7 @@ Publish ROS msg
 
 ![alt text](images/05_rviz_gazebo_setup.PNG)
 
-B- Apply filters and perform RANSAC plane segmentation
+#### B- Apply filters and perform RANSAC plane segmentation
 
     1- Downsample your point cloud by applying a Voxel Grid Filter.
     2- Apply a Pass Through Filter to isolate the table and objects.
@@ -187,6 +187,47 @@ Publish ROS msg
 
 
 ![alt text](images/07_inliers_table_rviz.PNG)
+
+#### C- Cluster the objects:
+
+use PCL's Euclidean Clustering algorithm to segment the remaining points into individual objects
+
+Euclidean Clustering 
+
+    white_cloud = XYZRGB_to_XYZ(extracted_outliers)# Apply function to convert XYZRGB to XYZ
+    tree = white_cloud.make_kdtree()
+
+    # TODO: Create Cluster-Mask Point Cloud to visualize each cluster separately ///////
+    ec = white_cloud.make_EuclideanClusterExtraction()
+
+    # Set tolerances for distance threshold 
+    # as well as minimum and maximum cluster size (in points)
+    # Your task is to experiment and find values that work for segmenting objects.
+    ec.set_ClusterTolerance(0.05)
+    ec.set_MinClusterSize(10)
+    ec.set_MaxClusterSize(2500)
+
+    # Search the k-d tree for clusters
+    ec.set_SearchMethod(tree)
+    # Extract indices for each of the discovered clusters
+    cluster_indices = ec.Extract()
+
+    cluster_color = get_color_list(len(cluster_indices))
+
+    color_cluster_point_list = []
+
+    for j, indices in enumerate(cluster_indices):
+        for i, indice in enumerate(indices):
+            color_cluster_point_list.append([white_cloud[indice][0],
+                                        white_cloud[indice][1],
+                                        white_cloud[indice][2],
+                                         rgb_to_float(cluster_color[j])])
+
+    #Create new cloud containing all clusters, each with unique color
+    cluster_cloud = pcl.PointCloud_PointXYZRGB()
+    cluster_cloud.from_list(color_cluster_point_list)
+
+![alt text](images/08_clustered_cloud.PNG)
 
 
 #### 2. Complete Exercise 3 Steps.  Features extracted and SVM trained.  Object recognition implemented.
