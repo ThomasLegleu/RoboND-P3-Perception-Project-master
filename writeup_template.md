@@ -131,49 +131,63 @@ You're reading it!
 
 The goal is to write a ROS node that takes in the camera data as a point cloud, filters that point cloud, then segments the individual objects using Euclidean clustering
 
-Step_01 publish the point cloud:
+A- publish the point cloud:
 
 Next, make the following changes to the script:
 
 Initialize your ROS node. In this step you are initializing a new node called "clustering". Create Subscribers. Here we're subscribing our node to the "sensor_stick/point_cloud" topic. Anytime a message arrives, the message data (a point cloud!) will be passed to the pcl_callback() function for processing. Create Publishers. Here you're creating two new publishers to publish the point cloud data for the table and the objects on the table to topics called pcl_table and pcl_objects, respectively. Spin while node is not shutdown. Here you're preventing your node from exiting until an intentional shutdown is invoked. Publish ROS messages from your pcl_callback(). For now you'll just be publishing the original pointcloud itself, but later you'll change these to be the point clouds associated with the table and the objects.
 
-TODO: ROS node initialization
+ROS node initialization
 
     rospy.init_node('clustering', anonymous=True)
     
-TODO: Create Subscribers
+Create Subscribers
 
     pcl_sub = rospy.Subscriber("/sensor_stick/point_cloud", pc2.PointCloud2, pcl_callback, queue_size=1)
     
-TODO: Create Publishers
+Create Publishers
 
     pcl_objects_pub = rospy.Publisher("/pcl_objects", PointCloud2, queue_size=1)
     pcl_table_pub = rospy.Publisher("/pcl_table", PointCloud2, queue_size=1)
     
-TODO: Spin while node is not shutdown
+Spin while node is not shutdown
 
     while not rospy.is_shutdown():
     rospy.spin()
     
-TODO: Publish ROS msg
+Publish ROS msg
 
     pcl_objects_pub.publish(pcl_msg)
     pcl_table_pub.publish(pcl_msg)
 
 ![alt text](images/05_rviz_gazebo_setup.PNG)
 
-2- Apply filters and perform RANSAC plane segmentation
+B- Apply filters and perform RANSAC plane segmentation
 
     1- Downsample your point cloud by applying a Voxel Grid Filter.
     2- Apply a Pass Through Filter to isolate the table and objects.
     3- Perform RANSAC plane fitting to identify the table.
-    4- Use the ExtractIndices Filter to create new point clouds containing the table and objects separately (I'll call them cloud_table     and cloud_objects going forward).
+    4- Use the ExtractIndices Filter to create new point clouds containing the table and objects separately (I'll call them     cloud_table and cloud_objects going forward).
 
-TODO: Convert ROS msg to PCL data
+Convert ROS msg to PCL data
+
+    cloud = ros_to_pcl(pcl_msg)
+
+Convert PCL data to ROS msg
+
+    ros_cloud_objects = pcl_to_ros(extracted_outliers) 
+    ros_cloud_table = pcl_to_ros(extracted_inliers)
+    
+Publish ROS msg
+
+    pcl_objects_pub.publish(ros_cloud_objects)
+    pcl_table_pub.publish(ros_cloud_table) 
+    
+![alt text](images/06_outliers_rviz.PNG)
 
 
+![alt text](images/07_inliers_table_rviz.PNG)
 
-  
 
 #### 2. Complete Exercise 3 Steps.  Features extracted and SVM trained.  Object recognition implemented.
 Here is an example of how to include an image in your writeup.
