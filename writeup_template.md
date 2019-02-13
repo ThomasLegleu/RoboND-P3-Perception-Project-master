@@ -162,7 +162,18 @@ TODO: Publish ROS msg
 
 ![alt text](images/05_rviz_gazebo_setup.PNG)
 
+2- Apply filters and perform RANSAC plane segmentation
 
+    1- Downsample your point cloud by applying a Voxel Grid Filter.
+    2- Apply a Pass Through Filter to isolate the table and objects.
+    3- Perform RANSAC plane fitting to identify the table.
+    4- Use the ExtractIndices Filter to create new point clouds containing the table and objects separately (I'll call them cloud_table     and cloud_objects going forward).
+
+TODO: Convert ROS msg to PCL data
+
+
+
+  
 
 #### 2. Complete Exercise 3 Steps.  Features extracted and SVM trained.  Object recognition implemented.
 Here is an example of how to include an image in your writeup.
