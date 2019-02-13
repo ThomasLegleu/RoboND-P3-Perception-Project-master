@@ -135,30 +135,26 @@ Step_01 publish the point cloud:
 
 Next, make the following changes to the script:
 
-Initialize your ROS node. In this step you are initializing a new node called "clustering".
+Initialize your ROS node. In this step you are initializing a new node called "clustering". Create Subscribers. Here we're subscribing our node to the "sensor_stick/point_cloud" topic. Anytime a message arrives, the message data (a point cloud!) will be passed to the pcl_callback() function for processing. Create Publishers. Here you're creating two new publishers to publish the point cloud data for the table and the objects on the table to topics called pcl_table and pcl_objects, respectively. Spin while node is not shutdown. Here you're preventing your node from exiting until an intentional shutdown is invoked. Publish ROS messages from your pcl_callback(). For now you'll just be publishing the original pointcloud itself, but later you'll change these to be the point clouds associated with the table and the objects.
 
 TODO: ROS node initialization
 
     rospy.init_node('clustering', anonymous=True)
     
-Create Subscribers. Here we're subscribing our node to the "sensor_stick/point_cloud" topic. Anytime a message arrives, the message data (a point cloud!) will be passed to the pcl_callback() function for processing.
 TODO: Create Subscribers
 
     pcl_sub = rospy.Subscriber("/sensor_stick/point_cloud", pc2.PointCloud2, pcl_callback, queue_size=1)
     
-Create Publishers. Here you're creating two new publishers to publish the point cloud data for the table and the objects on the table to topics called pcl_table and pcl_objects, respectively.
 TODO: Create Publishers
 
     pcl_objects_pub = rospy.Publisher("/pcl_objects", PointCloud2, queue_size=1)
     pcl_table_pub = rospy.Publisher("/pcl_table", PointCloud2, queue_size=1)
     
-Spin while node is not shutdown. Here you're preventing your node from exiting until an intentional shutdown is invoked.
 TODO: Spin while node is not shutdown
 
     while not rospy.is_shutdown():
     rospy.spin()
     
-Publish ROS messages from your pcl_callback(). For now you'll just be publishing the original pointcloud itself, but later you'll change these to be the point clouds associated with the table and the objects.
 TODO: Publish ROS msg
 
     pcl_objects_pub.publish(pcl_msg)
