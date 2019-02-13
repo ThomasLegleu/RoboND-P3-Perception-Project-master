@@ -133,9 +133,7 @@ The goal is to write a ROS node that takes in the camera data as a point cloud, 
 
 #### A- publish the point cloud:
 
-Next, make the following changes to the script:
 
-Initialize your ROS node. In this step you are initializing a new node called "clustering". Create Subscribers. Here we're subscribing our node to the "sensor_stick/point_cloud" topic. Anytime a message arrives, the message data (a point cloud!) will be passed to the pcl_callback() function for processing. Create Publishers. Here you're creating two new publishers to publish the point cloud data for the table and the objects on the table to topics called pcl_table and pcl_objects, respectively. Spin while node is not shutdown. Here you're preventing your node from exiting until an intentional shutdown is invoked. Publish ROS messages from your pcl_callback(). For now you'll just be publishing the original pointcloud itself, but later you'll change these to be the point clouds associated with the table and the objects.
 
 ROS node initialization
 
@@ -164,6 +162,7 @@ Publish ROS msg
 
 #### B- Apply filters and perform RANSAC plane segmentation
 
+    Use the code from the previous exercise to perform the proper filtering for the ROS node
     1- Downsample your point cloud by applying a Voxel Grid Filter.
     2- Apply a Pass Through Filter to isolate the table and objects.
     3- Perform RANSAC plane fitting to identify the table.
@@ -192,7 +191,14 @@ Publish ROS msg
 
 use PCL's Euclidean Clustering algorithm to segment the remaining points into individual objects
 
-Euclidean Clustering 
+The k-d tree data structure is used in the Euclidian Clustering algorithm to decrease the computational burden of searching for neighboring points. While other efficient algorithms/data structures for nearest neighbor search exist, PCL's Euclidian Clustering algorithm only supports k-d trees.
+
+To construct a k-d tree
+
+    1- convert your XYZRGB point cloud to XYZ, because PCL's Euclidean Clustering algorithm requires a point cloud with only        spatial information. 
+    2- construct a k-d tree from the white cloud
+
+Euclidean Clustering with a k-d tree and pcl//ROS
 
     white_cloud = XYZRGB_to_XYZ(extracted_outliers)# Apply function to convert XYZRGB to XYZ
     tree = white_cloud.make_kdtree()
@@ -207,13 +213,14 @@ Euclidean Clustering
     ec.set_MinClusterSize(10)
     ec.set_MaxClusterSize(2500)
 
-
-
     # Search the k-d tree for clusters
     ec.set_SearchMethod(tree)
-    
+   
     # Extract indices for each of the discovered clusters
     cluster_indices = ec.Extract()
+    
+
+Choosing a unique color for each segmented Object called cluster cloud 
 
     cluster_color = get_color_list(len(cluster_indices))
 
