@@ -276,7 +276,7 @@ loop through the objects import at random angles ( compute the histograms for hs
     for model_name in models:
         spawn_model(model_name)
 
-        for i in range(500):
+        for i in range(500): Increase this value to increase the number of times you capture features for each object.
             # make five attempts to get a valid a point cloud then give up
             sample_was_good = False
             try_count = 0
@@ -444,6 +444,10 @@ Train Your SVM
                                     X=X_train, 
                                     y=y_train
                                     )
+
+
+![alt text](images/12_training_(50).PNG)
+
 
 ![demo-1](https://user-images.githubusercontent.com/20687560/28748231-46b5b912-7467-11e7-8778-3095172b7b19.png)
 
