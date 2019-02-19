@@ -304,6 +304,147 @@ loop through the objects import at random angles ( compute the histograms for hs
 
 ![alt text](images/11_capture_Features.PNG)
 
+when you call the compute_color_histograms code and compute_normal_histograms it calls these two functions in features.py
+
+compute_color_histograms:
+
+    def compute_color_histograms(cloud, using_hsv=False):
+
+         # Compute histograms for the clusters
+        point_colors_list = []
+
+        # Step through each point in the point cloud
+        for point in pc2.read_points(cloud, skip_nans=True):
+            rgb_list = float_to_rgb(point[3])
+            if using_hsv:
+                point_colors_list.append(rgb_to_hsv(rgb_list) * 255)
+            else:
+                point_colors_list.append(rgb_list)
+
+        # Populate lists with color values
+        channel_1_vals = []
+        channel_2_vals = []
+        channel_3_vals = []
+
+        for color in point_colors_list:
+            channel_1_vals.append(color[0])
+            channel_2_vals.append(color[1])
+            channel_3_vals.append(color[2])
+    
+        #Compute histograms
+        nbins=32
+        bins_range=(0, 256)
+        
+        # Compute the histogram of the channels separately
+        channel_1_hist = np.histogram(channel_1_vals, bins=nbins, range=bins_range)
+        channel_2_hist = np.histogram(channel_2_vals, bins=nbins, range=bins_range)
+        channel_3_hist = np.histogram(channel_3_vals, bins=nbins, range=bins_range)
+
+        # TODO: Concatenate and normalize the histograms
+         hist_features = np.concatenate((channel_1_hist[0], channel_2_hist[0], channel_1_hist[0])).astype(np.float64)
+
+        # Generate random features for demo mode.  
+        # Replace normed_features with your feature vector
+        normed_features = hist_features / np.sum(hist_features) 
+
+        return normed_features 
+
+compute_normal_histograms:
+
+    def compute_normal_histograms(normal_cloud):
+        norm_x_vals = []
+        norm_y_vals = []
+        norm_z_vals = []
+
+        for norm_component in pc2.read_points(normal_cloud,
+                                              field_names = ('normal_x', 'normal_y', 'normal_z'),
+                                              skip_nans=True):
+            norm_x_vals.append(norm_component[0])
+            norm_y_vals.append(norm_component[1])
+            norm_z_vals.append(norm_component[2])
+
+        # Compute histograms of normal values (just like with color)
+
+        nbins=32
+        bins_range=(-1, 1)
+        
+        # Compute the histogram of the channels separately
+        norm_x_hist = np.histogram(norm_x_vals, bins=nbins, range=bins_range)
+        norm_y_hist = np.histogram(norm_y_vals, bins=nbins, range=bins_range)
+        norm_z_hist = np.histogram(norm_z_vals, bins=nbins, range=bins_range)
+
+        # TODO: Concatenate and normalize the histograms
+    
+        # Concatenate the histograms into a single feature vector
+        hist_features = np.concatenate((norm_x_hist[0], norm_y_hist[0], norm_z_hist[0])).astype(np.float64)
+    
+        # Normalize the result
+        normed_features = hist_features / np.sum(hist_features) 
+
+        # Generate random features for demo mode.  
+        # Replace normed_features with your feature vector
+
+        return normed_features
+
+Train Your SVM
+
+    # Load training data from disk
+    training_set = pickle.load(open('training_set.sav', 'rb'))
+
+    # Format the features and labels for use with scikit learn
+    feature_list = []
+    label_list = []
+
+    for item in training_set:
+        if np.isnan(item[0]).sum() < 1:
+            feature_list.append(item[0])
+            label_list.append(item[1])
+
+    print('Features in Training Set: {}'.format(len(training_set)))
+    print('Invalid Features in Training set: {}'.format(len(training_set)-len(feature_list)))
+
+    X = np.array(feature_list)
+    # Fit a per-column scaler
+    X_scaler = StandardScaler().fit(X)
+    # Apply the scaler to X
+    X_train = X_scaler.transform(X)
+    y_train = np.array(label_list)
+
+    # Convert label strings to numerical encoding
+    encoder = LabelEncoder()
+    y_train = encoder.fit_transform(y_train)
+
+#### Create classifier ///////////////////////////////////////////////////////////////////////////////////
+
+    clf = svm.SVC(kernel='linear')
+
+#### Set up 5-fold cross-validation ///////////////////////////////////////////////////////////////////////
+
+    n_splits = 5
+    kf = KFold(len(X_train),
+               shuffle=False,
+               random_state=1)
+
+
+#### Perform cross-validation ////////////////////////////////////////////////////////////////////////
+
+    scores = cross_val_score(cv=kf,
+                            estimator=clf,
+                             X=X_train, 
+                             y=y_train,
+                            scoring='accuracy'
+                            )
+    print('Scores: ' + str(scores))
+    print('Accuracy: %0.2f (+/- %0.2f)' % (scores.mean(), 2*scores.std()))
+
+#### Gather predictions ///////////////////////////////////////////////////////////////////
+
+    predictions = cross_val_predict(cv=kf,
+                                    estimator=clf,
+                                    X=X_train, 
+                                    y=y_train
+                                    )
+
 ![demo-1](https://user-images.githubusercontent.com/20687560/28748231-46b5b912-7467-11e7-8778-3095172b7b19.png)
 
 ### Pick and Place Setup
