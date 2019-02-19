@@ -446,8 +446,73 @@ Train Your SVM
                                     )
 
 
+results from the testing: plot with the confusion matrix normalized vs regular results
+
 ![alt text](images/12_training_(50).PNG)
 
+clustered_objects:
+
+ Use the code from the previous exercise to perform the proper filtering for the ROS node
+    1- Downsample your point cloud by applying a Voxel Grid Filter.
+    2- Apply a Pass Through Filter to isolate the table and objects.
+    3- Perform RANSAC plane fitting to identify the table.
+    4- Use the ExtractIndices Filter to create new point clouds containing the table and objects separately (I'll call them     cloud_table and cloud_objects going forward).
+    
+    
+5- create some empty lists to receive labels and object point clouds:
+
+    # Classify the clusters! (loop through each detected cluster one at a time)
+    detected_objects_labels = []
+    detected_objects = []
+
+6- write a for loop to cycle through each of the segmented clusters:
+
+    for index, pts_list in enumerate(cluster_indices):
+        # Grab the points for the cluster from the extracted outliers (cloud_objects)
+        pcl_cluster = extracted_outliers.extract(pts_list)
+        # TODO: convert the cluster from pcl to ROS using helper function
+        ros_cluster = pcl_to_ros(pcl_cluster)
+        # Extract histogram features
+        # TODO: complete this step just as is covered in capture_features.py
+        chists = compute_color_histograms(ros_cluster, using_hsv=True)
+        normals = get_normals(ros_cluster)
+        nhists = compute_normal_histograms(normals)
+        feature = np.concatenate((chists, nhists))
+        #labeled_features.append([feature, model_name])
+
+        # Make the prediction, retrieve the label for the result
+        # and add it to detected_objects_labels list
+        prediction = clf.predict(scaler.transform(feature.reshape(1,-1)))
+        label = encoder.inverse_transform(prediction)[0]
+        detected_objects_labels.append(label)
+
+        # Publish a label into RViz
+        label_pos = list(white_cloud[pts_list[0]])
+        label_pos[2] += .4
+        object_markers_pub.publish(make_label(label,label_pos, index))
+
+        # Add the detected object to the list of detected objects.
+        do = DetectedObject()
+        do.label = label
+        do.cloud = ros_cluster
+        detected_objects.append(do)
+
+    rospy.loginfo('Detected {} objects: {}'.format(len(detected_objects_labels), detected_objects_labels))
+    
+    # Publish the list of detected objects
+    # This is the output you'll need to complete the upcoming project!
+    detected_objects_pub.publish(detected_objects)
+
+7- add the following code to create some new publishers and read in your trained model:
+
+    # Load Model From disk
+    model = pickle.load(open('model.sav', 'rb'))
+    clf = model['classifier']
+    encoder = LabelEncoder()
+    encoder.classes_ = model['classes']
+    scaler = model['scaler']
+
+![alt text](images/13_object_recognition_(50).PNG)
 
 ![demo-1](https://user-images.githubusercontent.com/20687560/28748231-46b5b912-7467-11e7-8778-3095172b7b19.png)
 
