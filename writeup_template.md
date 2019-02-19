@@ -265,6 +265,14 @@ b- This script spawns objects in random orientations
 
 main bit of code for capture_feature.py
 
+grab the normals
+
+    def get_normals(cloud):
+        get_normals_prox = rospy.ServiceProxy('/feature_extractor/get_normals', GetNormals)
+        return get_normals_prox(cloud).cluster
+
+loop through the objects import at random angles ( compute the histograms for hsv and normals )
+
     for model_name in models:
         spawn_model(model_name)
 
@@ -292,7 +300,9 @@ main bit of code for capture_feature.py
 
         delete_model()
 
+![alt text](images/10_capture_Features.PNG)
 
+![alt text](images/11_capture_Features.PNG)
 
 ![demo-1](https://user-images.githubusercontent.com/20687560/28748231-46b5b912-7467-11e7-8778-3095172b7b19.png)
 
