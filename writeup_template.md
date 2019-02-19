@@ -246,6 +246,54 @@ Choosing a unique color for each segmented Object called cluster cloud
 #### 2. Complete Exercise 3 Steps.  Features extracted and SVM trained.  Object recognition implemented.
 Here is an example of how to include an image in your writeup.
 
+#### Generating Features
+
+launch the training.launch file to bring up the Gazebo environment
+
+    $ cd ~/catkin_ws
+    $ roslaunch sensor_stick training.launch
+
+#### Capturing Features
+
+a- run the capture_features.py script to capture and save features for each of the objects in the environment. 
+b- This script spawns objects in random orientations 
+
+   computes features based on the point clouds ( normals and hsv information )
+
+    $ cd ~/catkin_ws
+    $ rosrun sensor_stick capture_features.py
+
+main bit of code for capture_feature.py
+
+    for model_name in models:
+        spawn_model(model_name)
+
+        for i in range(500):
+            # make five attempts to get a valid a point cloud then give up
+            sample_was_good = False
+            try_count = 0
+            while not sample_was_good and try_count < 5:
+                sample_cloud = capture_sample()
+                sample_cloud_arr = ros_to_pcl(sample_cloud).to_array()
+
+                # Check for invalid clouds.
+                if sample_cloud_arr.shape[0] == 0:
+                    print('Invalid cloud detected')
+                    try_count += 1
+                else:
+                    sample_was_good = True
+
+            # Extract histogram features
+            chists = compute_color_histograms(sample_cloud, using_hsv=True)
+            normals = get_normals(sample_cloud)
+            nhists = compute_normal_histograms(normals)
+            feature = np.concatenate((chists, nhists))
+            labeled_features.append([feature, model_name])
+
+        delete_model()
+
+
+
 ![demo-1](https://user-images.githubusercontent.com/20687560/28748231-46b5b912-7467-11e7-8778-3095172b7b19.png)
 
 ### Pick and Place Setup
