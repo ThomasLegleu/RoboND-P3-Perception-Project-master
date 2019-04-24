@@ -412,11 +412,12 @@ Train Your SVM
     encoder = LabelEncoder()
     y_train = encoder.fit_transform(y_train)
 
-#### Create classifier ///////////////////////////////////////////////////////////////////////////////////
+#### Create classifier
 
     clf = svm.SVC(kernel='linear')
 
-#### Set up 5-fold cross-validation ///////////////////////////////////////////////////////////////////////
+#### Set up 5-fold cross-validation 
+k-Fold Cross-Validation. Cross-validation is a resampling procedure used to evaluate machine learning models on a limited data sample. The procedure has a single parameter called k that refers to the number of groups that a given data sample is to be split into. ... Take the group as a hold out or test data se
 
     n_splits = 5
     kf = KFold(len(X_train),
@@ -510,16 +511,26 @@ clustered_objects:
     encoder.classes_ = model['classes']
     scaler = model['scaler']
 
+
+#### Final Output of Object Recognition:
+
 ![alt text](images/13_object_recognition_(50).PNG)
 
-![demo-1](https://user-images.githubusercontent.com/20687560/28748231-46b5b912-7467-11e7-8778-3095172b7b19.png)
+![alt text](images/13_object_recognition_(50).PNG)
+
+![alt text](images/13_object_recognition_(50).PNG)
+
+![alt text](images/13_object_recognition_(50).PNG)
+
+Instructions For Running On Ubuntu Machines:
+
+
 
 ### Pick and Place Setup
 
 #### 1. For all three tabletop setups (`test*.world`), perform object recognition, then read in respective pick list (`pick_list_*.yaml`). Next construct the messages that would comprise a valid `PickPlace` request output them to `.yaml` format.
 
-And here's another image! 
-![demo-2](https://user-images.githubusercontent.com/20687560/28748286-9f65680e-7468-11e7-83dc-f1a32380b89c.png)
+
 
 Spend some time at the end to discuss your code, what techniques you used, what worked and why, where the implementation might fail and how you might improve it if you were going to pursue this project further.  
 
