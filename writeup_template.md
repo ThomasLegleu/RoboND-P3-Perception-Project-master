@@ -597,7 +597,91 @@ Exercise_03
     ./object_recognition.py
 
 
-Final Project ////////////////////////////////////////////////////////////////////////////////
+
+### Pick and Place Setup
+
+#### 1. For all three tabletop setups (`test*.world`), perform object recognition, then read in respective pick list (`pick_list_*.yaml`). Next construct the messages that would comprise a valid `PickPlace` request output them to `.yaml` format.
+
+1- copy your ./object_recognition.py into the proper places of  project_template.py
+
+2- Update the proper function for exporting yaml files
+
+
+    #function to load parameters and request PickPlace service in the project_template.py
+
+    def pr2_mover(object_list):
+
+
+        # Initialize variables
+        test_scene_num = Int32()
+        object_name    = String()
+        pick_pose      = Pose()
+        place_pose     = Pose()
+        arm_name       = String()
+        yaml_dict_list = []
+
+        # Update test scene number based on the selected test.
+        test_scene_num.data = 3
+
+
+        # Get Parameters
+        object_list_param = rospy.get_param('/object_list')
+        dropbox_param     = rospy.get_param('/dropbox')
+
+
+        # Calculate detected objects centroids.
+        labels = []
+        centroids = [] # to be list of tuples (x, y, z)
+        for object in object_list:
+            labels.append(object.label)
+            points_arr = ros_to_pcl(object.cloud).to_array()
+            centroids.append(np.mean(points_arr, axis=0)[:3])
+
+
+
+        # Loop through the pick list
+        for i in range(0, len(object_list_param)):
+
+
+            # Read object name and group from object list.
+            object_name.data = object_list_param[i]['name' ]
+            object_group     = object_list_param[i]['group']
+
+            # Select pick pose
+            try:
+                index = labels.index(object_name.data)
+                print("got one")
+            except ValueError:
+                print "Object not detected: %s" %object_name.data
+                continue
+
+            pick_pose.position.x = np.asscalar(centroids[index][0])
+            pick_pose.position.y = np.asscalar(centroids[index][1])
+            pick_pose.position.z = np.asscalar(centroids[index][2])
+
+            # Select place pose
+            position = search_dictionaries('group', object_group, 'position', dropbox_param)
+            place_pose.position.x = position[0]
+            place_pose.position.y = position[1]
+            place_pose.position.z = position[2]
+
+            # Select the arm to be used for pick_place
+            arm_name.data = search_dictionaries('group', object_group, 'name', dropbox_param)
+
+            # Create a list of dictionaries for later output to yaml format
+            yaml_dict = make_yaml_dict(test_scene_num, arm_name, object_name, pick_pose, place_pose)
+            yaml_dict_list.append(yaml_dict)
+            print(yaml_dict)
+
+
+        # Output your request parameters into output yaml file
+        yaml_filename = 'output_'+str(test_scene_num.data)+'.yaml'
+        send_to_yaml(yaml_filename, yaml_dict_list)
+        print("sent file")
+
+        return
+
+3- Run the Capture, Train Features, and pick list FInal Workflow for deploying the pr2 robot
 
     Capture and Train Features based on pick list
     
@@ -638,13 +722,6 @@ Final Project //////////////////////////////////////////////////////////////////
 
 
 
-### Pick and Place Setup
-
-#### 1. For all three tabletop setups (`test*.world`), perform object recognition, then read in respective pick list (`pick_list_*.yaml`). Next construct the messages that would comprise a valid `PickPlace` request output them to `.yaml` format.
-
-
-
-Spend some time at the end to discuss your code, what techniques you used, what worked and why, where the implementation might fail and how you might improve it if you were going to pursue this project further.  
 
 
 
