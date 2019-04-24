@@ -425,7 +425,7 @@ k-Fold Cross-Validation. Cross-validation is a resampling procedure used to eval
                random_state=1)
 
 
-#### Perform cross-validation ////////////////////////////////////////////////////////////////////////
+#### Perform cross-validation 
 
     scores = cross_val_score(cv=kf,
                             estimator=clf,
@@ -436,7 +436,7 @@ k-Fold Cross-Validation. Cross-validation is a resampling procedure used to eval
     print('Scores: ' + str(scores))
     print('Accuracy: %0.2f (+/- %0.2f)' % (scores.mean(), 2*scores.std()))
 
-#### Gather predictions ///////////////////////////////////////////////////////////////////
+#### Gather predictions 
 
     predictions = cross_val_predict(cv=kf,
                                     estimator=clf,
@@ -522,7 +522,119 @@ clustered_objects:
 
 ![alt text](images/13_object_recognition_(50).PNG)
 
-Instructions For Running On Ubuntu Machines:
+#### Instructions For Running On Ubuntu Machine Terminal:
+
+Exercise_01 ////////////////////////////////////////////////////////////////////////////
+with 
+python RANSAC.py
+
+
+    pcl_viewer voxel_downsampled.pcd 
+
+    pcl_viewer pass_through_filtered.pcd
+
+    pcl_viewer extracted_inliers.pcd
+
+    pcl_viewer extracted_outliers.pcd
+
+
+Exercise_02 
+
+    termincal_01
+    $roscore
+
+    terminal_02
+    $ cd ~/catkin_ws2
+    export GAZEBO_MODEL_PATH=~/catkin_ws2/src/sensor_stick/models
+    $ source ~/catkin_ws2/devel/setup.bash
+    roslaunch sensor_stick robot_spawn.launch
+
+    terminal_03
+    $ cd ~/catkin_ws2
+    export GAZEBO_MODEL_PATH=~/catkin_ws2/src/sensor_stick/models
+    $ source ~/catkin_ws2/devel/setup.bash
+    ./segmentation.py
+
+
+
+Exercise_03 
+
+    Capture and Train Features 
+    
+    termincal_01
+    $roscore
+
+    terminal_02
+    $ cd ~/catkin_ws2
+    export GAZEBO_MODEL_PATH=~/catkin_ws2/src/sensor_stick/models
+    $ source ~/catkin_ws2/devel/setup.bash
+    $ roslaunch sensor_stick training.launch
+
+    terminal_03
+    $ cd ~/catkin_ws2
+    export GAZEBO_MODEL_PATH=~/catkin_ws2/src/sensor_stick/models
+    $ source ~/catkin_ws2/devel/setup.bash
+    $ rosrun sensor_stick capture_features.py
+
+    #run in terminal_03 once capture_features.py is complete
+    rosrun sensor_stick train_svm.py
+    
+    Run Test in rviz
+    
+    termincal_01
+    $roscore
+    
+    terminal_02
+    $ cd ~/catkin_ws2
+    export GAZEBO_MODEL_PATH=~/catkin_ws2/src/sensor_stick/models
+    $ source ~/catkin_ws2/devel/setup.bash
+    roslaunch sensor_stick robot_spawn.launch
+    
+    terminal_03
+    $ cd ~/catkin_ws2
+    export GAZEBO_MODEL_PATH=~/catkin_ws2/src/sensor_stick/models
+    $ source ~/catkin_ws2/devel/setup.bash
+    ./object_recognition.py
+
+
+Final Project ////////////////////////////////////////////////////////////////////////////////
+
+    Capture and Train Features based on pick list
+    
+    termincal_01
+    $roscore
+
+    terminal_02
+    $ cd ~/catkin_ws2
+    export GAZEBO_MODEL_PATH=~/catkin_ws2/src/sensor_stick/models
+    $ source ~/catkin_ws2/devel/setup.bash
+    $ roslaunch sensor_stick training.launch
+
+    terminal_03
+    $ cd ~/catkin_ws2
+    export GAZEBO_MODEL_PATH=~/catkin_ws2/src/sensor_stick/models
+    $ source ~/catkin_ws2/devel/setup.bash
+    $ rosrun sensor_stick capture_features.py
+
+    #run in terminal_03 once capture_features.py is complete
+    rosrun sensor_stick train_svm.py
+    
+    FInal Workflow for deploying the pr2 robot
+
+    termincal_01
+    $roscore
+    
+    termincal_02
+    $ cd ~/catkin_ws2
+    source ~/catkin_ws2/devel/setup.bash
+    export GAZEBO_MODEL_PATH=~/catkin_ws2/src/RoboND-Perception-Project/pr2_robot/models:$GAZEBO_MODEL_PATH
+    roslaunch pr2_robot pick_place_project.launch
+
+    termincal_03
+    $ cd ~/catkin_ws2
+    source ~/catkin_ws2/devel/setup.bash
+    export GAZEBO_MODEL_PATH=~/catkin_ws2/src/RoboND-Perception-Project/pr2_robot/models:$GAZEBO_MODEL_PATH
+    rosrun pr2_robot project_template.py
 
 
 
