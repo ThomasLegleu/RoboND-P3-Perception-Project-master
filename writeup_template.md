@@ -69,8 +69,6 @@ You're reading it!
 
 #### b- PassThrough filter
 
-![alt text](images/02_pass_throughfilter.PNG)
-
 
     # PassThrough filter
     # Create a PassThrough filter object.
@@ -89,8 +87,6 @@ You're reading it!
     pcl.save(cloud_filtered, filename)
 
 #### c- RANSAC plane segmentation // Extract inliers
-
-![alt text](images/03_RANSAC_Extracting_inliers.PNG)
 
 
     # Create the segmentation object
@@ -117,8 +113,6 @@ You're reading it!
     #pcl.save(cloud, filename)
 
 #### d-Extract outliers
-
-![alt text](images/04_RANSAC_Extracting_outliers.PNG)
     
     extracted_outliers = cloud_filtered.extract(inliers, negative=True)
     filename = 'extracted_outliers.pcd'
@@ -179,6 +173,8 @@ Publish ROS msg
 
     pcl_objects_pub.publish(ros_cloud_objects)
     pcl_table_pub.publish(ros_cloud_table) 
+    
+Inliers and Outliers shown in ROS
     
 ![alt text](images/06_outliers_rviz.PNG)
 
