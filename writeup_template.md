@@ -441,11 +441,17 @@ k-Fold Cross-Validation. Cross-validation is a resampling procedure used to eval
                                     )
 
 
-results from the testing: plot with the confusion matrix normalized vs regular results
+#### results from the testing: plot with the confusion matrix normalized vs regular results
+
+01 - confision matrix 50 sampled shapes per object
 
 ![alt text](images/12_training_(50).PNG)
 
+02 - confision matrix 300 sampled shapes per object
+
 ![alt text](images/12_training_(300_87).PNG)
+
+03 - confision matrix 300 sampled shapes per object
 
 ![alt text](images/14_cm_output2.PNG)
 
