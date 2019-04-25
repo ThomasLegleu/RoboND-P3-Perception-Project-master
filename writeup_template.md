@@ -451,7 +451,7 @@ results from the testing: plot with the confusion matrix normalized vs regular r
 
 ![alt text](images/12_training_(300_87).PNG)
 
-![alt text](images/14_cm_output2..PNG)
+![alt text](images/14_cm_output2.PNG)
 
 clustered_objects:
 
