@@ -718,15 +718,15 @@ Exercise_03
     rosrun pr2_robot project_template.py
 
 
-#### test for output_1 [ 3/3 ]
+#### 1- test for output_1 [ 3/3 ]
 
 ![alt text](images/13_training_set_01.PNG)
 
-#### test for output_2 [ 5/5 ]
+#### 2- test for output_2 [ 5/5 ]
 
 ![alt text](images/15_rviz_output2.PNG)
 
-#### test for output_3 [ 7/8 ]
+#### 3- test for output_3 [ 7/8 ]
 
 ![alt text](images/16_rviz_output3.PNG)
 
