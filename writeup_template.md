@@ -456,11 +456,14 @@ results from the testing: plot with the confusion matrix normalized vs regular r
 clustered_objects:
 
  Use the code from the previous exercise to perform the proper filtering for the ROS node
-    1- Downsample your point cloud by applying a Voxel Grid Filter.
-    2- Apply a Pass Through Filter to isolate the table and objects.
-    3- Perform RANSAC plane fitting to identify the table.
-    4- Use the ExtractIndices Filter to create new point clouds containing the table and objects separately (I'll call them     cloud_table and cloud_objects going forward).
+ 
+1- Downsample your point cloud by applying a Voxel Grid Filter.
     
+2- Apply a Pass Through Filter to isolate the table and objects.
+    
+3- Perform RANSAC plane fitting to identify the table.
+    
+4- Use the ExtractIndices Filter to create new point clouds containing the table and objects separately 
     
 5- create some empty lists to receive labels and object point clouds:
 
@@ -519,8 +522,6 @@ clustered_objects:
 #### Final Output of Object Recognition:
 
 ![alt text](images/13_object_recognition_(50).PNG)
-
-
 
 #### Instructions For Running On Ubuntu Machine Terminal:
 
@@ -721,6 +722,12 @@ Exercise_03
     rosrun pr2_robot project_template.py
 
 
+
+![alt text](images/13_training_set_01.PNG)
+
+![alt text](images/15_rviz_output2.PNG)
+
+![alt text](images/16_rviz_output3.PNG)
 
 
 
