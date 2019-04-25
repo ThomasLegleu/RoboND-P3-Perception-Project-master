@@ -734,7 +734,7 @@ Exercise_03
 
 #### 3- test for output_3 [ 7/8 ]
 
-![alt text](images/16_rviz_output3.PNG)
+![alt text](images/16_rviz_output31.PNG)
 
 
 
