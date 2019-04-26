@@ -69,6 +69,7 @@ You're reading it!
 
 #### b- PassThrough filter
 
+![alt text](images/02_pass_throughfilter.PNG)
 
     # PassThrough filter
     # Create a PassThrough filter object.
@@ -88,6 +89,7 @@ You're reading it!
 
 #### c- RANSAC plane segmentation // Extract inliers
 
+![alt text](images/03_RANSAC_Extracting_inliers.PNG)
 
     # Create the segmentation object
     seg = cloud_filtered.make_segmenter()
@@ -113,6 +115,8 @@ You're reading it!
     #pcl.save(cloud, filename)
 
 #### d-Extract outliers
+
+![alt text](images/04_RANSAC_Extracting_outliers.PNG) 
     
     extracted_outliers = cloud_filtered.extract(inliers, negative=True)
     filename = 'extracted_outliers.pcd'
