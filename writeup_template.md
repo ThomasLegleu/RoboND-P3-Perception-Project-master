@@ -737,10 +737,10 @@ Exercise_03
 ![alt text](images/16_rviz_output31.PNG)
 
 
-### Final Comment
+### Final Comments
 
-All in all this was a really egsging project. It demanded a lot of control of the code and the orginization of the code in order for 
-it to be deployed properly. The next steps for me would be to work on outputing the the last yaml and work on the collision avoidance algortithm. For now I am plesed with the object recognition and training of the captured features of the 
-output1.yaml - output3.yaml files
+All in all this was a really engaging project. It demanded a lot of control of the code and the organization of the code in order for 
+it to be deployed properly. The next steps for me would be to work on outputing the the last output4.yaml and work on the collision avoidance algortithm for the extra steps. For now I am pleased with the object recognition and training of the captured features of the 
+output1.yaml - output3.yaml files.
 
 
