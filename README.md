@@ -10,7 +10,7 @@ Given the cluttered tabletop scenario, you must implement a perception pipeline 
 
 # Project Setup
 For this setup, catkin_ws is the name of active ROS Workspace, if your workspace name is different, change the commands accordingly
-If you do not have an active ROS workspace, you can create one by:
+If you do not have an actives ROS workspace, you can create one by:
 
 ```sh
 $ mkdir -p ~/catkin_ws/src
