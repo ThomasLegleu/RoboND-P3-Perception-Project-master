@@ -12,8 +12,10 @@
 
 #### Load Point Cloud file
 
+    ```python
     cloud = pcl.load_XYZRGB('tabletop.pcd')
-
+    ```
+    
 #### a- Voxel Grid filter
 
 ![alt text](images/01_voxel_DownSample_0.005.PNG)
