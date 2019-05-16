@@ -3,13 +3,6 @@
 
 ### Exercise 1, 2 and 3 pipeline implemented
 
-```sh
-$ mkdir -p ~/catkin_ws/src
-$ cd ~/catkin_ws/
-$ catkin_make
-```
-
-
 #### 1. Complete Exercise 1 steps. Pipeline for filtering and RANSAC plane fitting implemented.
 
 #### Import PCL module
@@ -104,6 +97,27 @@ filename = 'extracted_outliers.pcd'
 pcl.save(extracted_outliers, filename)
 ```    
 
+#### Instructions For Visualizing the pointcloud at through diff filters
+
+Exercise_01 ////////////////////////////////////////////////////////////////////////////
+
+Execute with python RANSAC.py in one terminal and the execution of pcl_viewer in another terminal
+
+```sh
+python RANSAC.py
+```
+
+```sh
+pcl_viewer voxel_downsampled.pcd 
+
+pcl_viewer pass_through_filtered.pcd
+
+pcl_viewer extracted_inliers.pcd
+
+pcl_viewer extracted_outliers.pcd
+```
+
+
 #### 2. Complete Exercise 2 steps: Pipeline including clustering for segmentation implemented.  
 
 The goal is to write a ROS node that takes in the camera data as a point cloud, filters that point cloud, then segments the individual objects using Euclidean clustering
@@ -113,15 +127,15 @@ The goal is to write a ROS node that takes in the camera data as a point cloud, 
 
 ROS node initialization
 
-    ```python
-    rospy.init_node('clustering', anonymous=True)
-    ```
+```python
+rospy.init_node('clustering', anonymous=True)
+```
     
 Create Subscribers
 
-    ```python
-    pcl_sub = rospy.Subscriber("/sensor_stick/point_cloud", pc2.PointCloud2, pcl_callback, queue_size=1)
-    ```
+```python
+pcl_sub = rospy.Subscriber("/sensor_stick/point_cloud", pc2.PointCloud2, pcl_callback, queue_size=1)
+```
     
 Create Publishers
 
@@ -130,11 +144,13 @@ pcl_objects_pub = rospy.Publisher("/pcl_objects", PointCloud2, queue_size=1)
 pcl_table_pub = rospy.Publisher("/pcl_table", PointCloud2, queue_size=1)
 ```
 
-Spin while node is not shutdown
+Spin while node is not shutdown: lets all the callbacks get called for your subscribers.
 
-    while not rospy.is_shutdown():
-    rospy.spin()
-    
+```python
+while not rospy.is_shutdown():
+rospy.spin()
+```
+
 Publish ROS msg
 
 ```python
@@ -215,59 +231,85 @@ cluster_indices = ec.Extract()
 
 Choosing a unique color for each segmented Object called cluster cloud 
 
-    cluster_color = get_color_list(len(cluster_indices))
+```python
+cluster_color = get_color_list(len(cluster_indices))
 
-    color_cluster_point_list = []
+color_cluster_point_list = []
 
-    for j, indices in enumerate(cluster_indices):
-        for i, indice in enumerate(indices):
-            color_cluster_point_list.append([white_cloud[indice][0],
-                                        white_cloud[indice][1],
-                                        white_cloud[indice][2],
-                                         rgb_to_float(cluster_color[j])])
+for j, indices in enumerate(cluster_indices):
+    for i, indice in enumerate(indices):
+        color_cluster_point_list.append([white_cloud[indice][0],
+                                    white_cloud[indice][1],
+                                    white_cloud[indice][2],
+                                    rgb_to_float(cluster_color[j])])
 
-    #Create new cloud containing all clusters, each with unique color
-    cluster_cloud = pcl.PointCloud_PointXYZRGB()
-    cluster_cloud.from_list(color_cluster_point_list)
+#Create new cloud containing all clusters, each with unique color
+cluster_cloud = pcl.PointCloud_PointXYZRGB()
+cluster_cloud.from_list(color_cluster_point_list)
 
-
-    ros_cluster_cloud = pcl_to_ros(cluster_cloud)
+ros_cluster_cloud = pcl_to_ros(cluster_cloud)
+```
 
 ![alt text](images/08_clustered_cloud.PNG)
 
 
-#### 2. Complete Exercise 3 Steps.  Features extracted and SVM trained.  Object recognition implemented.
-Here is an example of how to include an image in your writeup.
 
-#### Generating Features
+Exercise_02 Terminals to run the exercise
+
+```sh
+termincal_01
+$roscore
+
+terminal_02
+$ cd ~/catkin_ws2
+$ export GAZEBO_MODEL_PATH=~/catkin_ws2/src/sensor_stick/models
+$ source ~/catkin_ws2/devel/setup.bash
+$ roslaunch sensor_stick robot_spawn.launch
+
+terminal_03
+$ cd ~/catkin_ws2
+$ export GAZEBO_MODEL_PATH=~/catkin_ws2/src/sensor_stick/models
+$ source ~/catkin_ws2/devel/setup.bash
+$ ./segmentation.py
+```
+
+#### 3. Complete Exercise 3 Steps.  Features extracted and SVM trained.  Object recognition implemented.
+
+#### 1- Generating Feature: terminal one 
 
 launch the training.launch file to bring up the Gazebo environment
 
-    $ cd ~/catkin_ws
-    $ roslaunch sensor_stick training.launch
+```sh
+$ cd ~/catkin_ws
+$ roslaunch sensor_stick training.launch
+```
 
-#### Capturing Features
+#### 2- Capturing Features: terminal two
 
 a- run the capture_features.py script to capture and save features for each of the objects in the environment. 
 b- This script spawns objects in random orientations 
 
    computes features based on the point clouds ( normals and hsv information )
 
-    $ cd ~/catkin_ws
-    $ rosrun sensor_stick capture_features.py
+```sh
+$ cd ~/catkin_ws
+$ rosrun sensor_stick capture_features.py
+```
 
-main bit of code for capture_feature.py
+main bit of code for capture_feature.py that needed to be updated for successful capturing
 
 grab the normals
 
-    def get_normals(cloud):
-        get_normals_prox = rospy.ServiceProxy('/feature_extractor/get_normals', GetNormals)
-        return get_normals_prox(cloud).cluster
-
+```python
+def get_normals(cloud):
+    get_normals_prox = rospy.ServiceProxy('/feature_extractor/get_normals', GetNormals)
+    return get_normals_prox(cloud).cluster
+```
 loop through the objects import at random angles ( compute the histograms for hsv and normals )
 
-    for model_name in models:
-        spawn_model(model_name)
+```python
+for model_name in models:
+     spawn_model(model_name)
 
         for i in range(500): Increase this value to increase the number of times you capture features for each object.
             # make five attempts to get a valid a point cloud then give up
@@ -292,6 +334,7 @@ loop through the objects import at random angles ( compute the histograms for hs
             labeled_features.append([feature, model_name])
 
         delete_model()
+```
 
 ![alt text](images/10_capture_Features.PNG)
 
@@ -301,6 +344,7 @@ when you call the compute_color_histograms code and compute_normal_histograms it
 
 compute_color_histograms:
 
+```python
     def compute_color_histograms(cloud, using_hsv=False):
 
          # Compute histograms for the clusters
@@ -341,10 +385,13 @@ compute_color_histograms:
         normed_features = hist_features / np.sum(hist_features) 
 
         return normed_features 
+```
+
 
 compute_normal_histograms:
 
-    def compute_normal_histograms(normal_cloud):
+```python
+def compute_normal_histograms(normal_cloud):
         norm_x_vals = []
         norm_y_vals = []
         norm_z_vals = []
@@ -378,67 +425,76 @@ compute_normal_histograms:
         # Replace normed_features with your feature vector
 
         return normed_features
+```
 
 Train Your SVM
 
-    # Load training data from disk
-    training_set = pickle.load(open('training_set.sav', 'rb'))
+```python
+# Load training data from disk
+training_set = pickle.load(open('training_set.sav', 'rb'))
 
-    # Format the features and labels for use with scikit learn
-    feature_list = []
-    label_list = []
+# Format the features and labels for use with scikit learn
+feature_list = []
+label_list = []
 
-    for item in training_set:
-        if np.isnan(item[0]).sum() < 1:
-            feature_list.append(item[0])
-            label_list.append(item[1])
+for item in training_set:
+     if np.isnan(item[0]).sum() < 1:
+         feature_list.append(item[0])
+         label_list.append(item[1])
 
-    print('Features in Training Set: {}'.format(len(training_set)))
-    print('Invalid Features in Training set: {}'.format(len(training_set)-len(feature_list)))
+print('Features in Training Set: {}'.format(len(training_set)))
+print('Invalid Features in Training set: {}'.format(len(training_set)-len(feature_list)))
 
-    X = np.array(feature_list)
-    # Fit a per-column scaler
-    X_scaler = StandardScaler().fit(X)
-    # Apply the scaler to X
-    X_train = X_scaler.transform(X)
-    y_train = np.array(label_list)
+X = np.array(feature_list)
+# Fit a per-column scaler
+X_scaler = StandardScaler().fit(X)
+# Apply the scaler to X
+X_train = X_scaler.transform(X)
+y_train = np.array(label_list)
 
-    # Convert label strings to numerical encoding
-    encoder = LabelEncoder()
-    y_train = encoder.fit_transform(y_train)
+# Convert label strings to numerical encoding
+encoder = LabelEncoder()
+y_train = encoder.fit_transform(y_train)
+```
 
 #### Create classifier
 
-    clf = svm.SVC(kernel='linear')
+```python
+clf = svm.SVC(kernel='linear')
+```
 
 #### Set up 5-fold cross-validation 
 k-Fold Cross-Validation. Cross-validation is a resampling procedure used to evaluate machine learning models on a limited data sample. The procedure has a single parameter called k that refers to the number of groups that a given data sample is to be split into. ... Take the group as a hold out or test data se
 
-    n_splits = 5
-    kf = KFold(len(X_train),
-               shuffle=False,
-               random_state=1)
-
+```python
+n_splits = 5
+kf = KFold(len(X_train),
+           shuffle=False,
+           random_state=1)
+```
 
 #### Perform cross-validation 
 
-    scores = cross_val_score(cv=kf,
-                            estimator=clf,
-                             X=X_train, 
-                             y=y_train,
-                            scoring='accuracy'
-                            )
-    print('Scores: ' + str(scores))
-    print('Accuracy: %0.2f (+/- %0.2f)' % (scores.mean(), 2*scores.std()))
+```python
+scores = cross_val_score(cv=kf,
+                        estimator=clf,
+                        X=X_train, 
+                         y=y_train,
+                        scoring='accuracy'
+                        )
+print('Scores: ' + str(scores))
+print('Accuracy: %0.2f (+/- %0.2f)' % (scores.mean(), 2*scores.std()))
+```
 
 #### Gather predictions 
 
-    predictions = cross_val_predict(cv=kf,
+```python
+predictions = cross_val_predict(cv=kf,
                                     estimator=clf,
                                     X=X_train, 
                                     y=y_train
                                     )
-
+```
 
 #### results from the testing: plot with the confusion matrix normalized vs regular results
 
@@ -468,137 +524,105 @@ clustered_objects:
     
 5- create some empty lists to receive labels and object point clouds:
 
-    # Classify the clusters! (loop through each detected cluster one at a time)
-    detected_objects_labels = []
-    detected_objects = []
-
+```python
+# Classify the clusters! (loop through each detected cluster one at a time)
+detected_objects_labels = []
+detected_objects = []
+```
 6- write a for loop to cycle through each of the segmented clusters:
 
-    for index, pts_list in enumerate(cluster_indices):
-        # Grab the points for the cluster from the extracted outliers (cloud_objects)
-        pcl_cluster = extracted_outliers.extract(pts_list)
-        # TODO: convert the cluster from pcl to ROS using helper function
-        ros_cluster = pcl_to_ros(pcl_cluster)
-        # Extract histogram features
-        # TODO: complete this step just as is covered in capture_features.py
-        chists = compute_color_histograms(ros_cluster, using_hsv=True)
-        normals = get_normals(ros_cluster)
-        nhists = compute_normal_histograms(normals)
-        feature = np.concatenate((chists, nhists))
-        #labeled_features.append([feature, model_name])
+```python
+for index, pts_list in enumerate(cluster_indices):
+    # Grab the points for the cluster from the extracted outliers (cloud_objects)
+    pcl_cluster = extracted_outliers.extract(pts_list)
+    # TODO: convert the cluster from pcl to ROS using helper function
+    ros_cluster = pcl_to_ros(pcl_cluster)
+    # Extract histogram features
+    # TODO: complete this step just as is covered in capture_features.py
+    chists = compute_color_histograms(ros_cluster, using_hsv=True)
+    normals = get_normals(ros_cluster)
+    nhists = compute_normal_histograms(normals)
+    feature = np.concatenate((chists, nhists))
+    #labeled_features.append([feature, model_name])
 
-        # Make the prediction, retrieve the label for the result
-        # and add it to detected_objects_labels list
-        prediction = clf.predict(scaler.transform(feature.reshape(1,-1)))
-        label = encoder.inverse_transform(prediction)[0]
-        detected_objects_labels.append(label)
+    # Make the prediction, retrieve the label for the result
+    # and add it to detected_objects_labels list
+    prediction = clf.predict(scaler.transform(feature.reshape(1,-1)))
+    label = encoder.inverse_transform(prediction)[0]
+    detected_objects_labels.append(label)
 
-        # Publish a label into RViz
-        label_pos = list(white_cloud[pts_list[0]])
-        label_pos[2] += .4
-        object_markers_pub.publish(make_label(label,label_pos, index))
+    # Publish a label into RViz
+    label_pos = list(white_cloud[pts_list[0]])
+    label_pos[2] += .4
+    object_markers_pub.publish(make_label(label,label_pos, index))
 
-        # Add the detected object to the list of detected objects.
-        do = DetectedObject()
-        do.label = label
-        do.cloud = ros_cluster
-        detected_objects.append(do)
+    # Add the detected object to the list of detected objects.
+    do = DetectedObject()
+    do.label = label
+    do.cloud = ros_cluster
+    detected_objects.append(do)
 
-    rospy.loginfo('Detected {} objects: {}'.format(len(detected_objects_labels), detected_objects_labels))
+rospy.loginfo('Detected {} objects: {}'.format(len(detected_objects_labels), detected_objects_labels))
     
-    # Publish the list of detected objects
-    # This is the output you'll need to complete the upcoming project!
-    detected_objects_pub.publish(detected_objects)
+# Publish the list of detected objects
+# This is the output you'll need to complete the upcoming project!
+detected_objects_pub.publish(detected_objects)
+```
 
 7- add the following code to create some new publishers and read in your trained model:
 
-    # Load Model From disk
-    model = pickle.load(open('model.sav', 'rb'))
-    clf = model['classifier']
-    encoder = LabelEncoder()
-    encoder.classes_ = model['classes']
-    scaler = model['scaler']
-
+```python
+# Load Model From disk
+model = pickle.load(open('model.sav', 'rb'))
+clf = model['classifier']
+encoder = LabelEncoder()
+encoder.classes_ = model['classes']
+scaler = model['scaler']
+```
 
 #### Final Output of Object Recognition:
 
 ![alt text](images/13_object_recognition_(50).PNG)
 
-#### Instructions For Running On Ubuntu Machine Terminal:
+#### Instructions For Running On Ubuntu Machine Terminal: Exercise_03 
 
-Exercise_01 ////////////////////////////////////////////////////////////////////////////
-with 
-python RANSAC.py
-
-
-    pcl_viewer voxel_downsampled.pcd 
-
-    pcl_viewer pass_through_filtered.pcd
-
-    pcl_viewer extracted_inliers.pcd
-
-    pcl_viewer extracted_outliers.pcd
-
-
-Exercise_02 
-
-    termincal_01
-    $roscore
-
-    terminal_02
-    $ cd ~/catkin_ws2
-    export GAZEBO_MODEL_PATH=~/catkin_ws2/src/sensor_stick/models
-    $ source ~/catkin_ws2/devel/setup.bash
-    roslaunch sensor_stick robot_spawn.launch
-
-    terminal_03
-    $ cd ~/catkin_ws2
-    export GAZEBO_MODEL_PATH=~/catkin_ws2/src/sensor_stick/models
-    $ source ~/catkin_ws2/devel/setup.bash
-    ./segmentation.py
-
-
-
-Exercise_03 
-
-    Capture and Train Features 
+```sh
+Capture and Train Features
     
-    termincal_01
-    $roscore
+termincal_01
+$roscore
 
-    terminal_02
-    $ cd ~/catkin_ws2
-    export GAZEBO_MODEL_PATH=~/catkin_ws2/src/sensor_stick/models
-    $ source ~/catkin_ws2/devel/setup.bash
-    $ roslaunch sensor_stick training.launch
+terminal_02
+$ cd ~/catkin_ws2
+export GAZEBO_MODEL_PATH=~/catkin_ws2/src/sensor_stick/models
+$ source ~/catkin_ws2/devel/setup.bash
+$ roslaunch sensor_stick training.launch
 
-    terminal_03
-    $ cd ~/catkin_ws2
-    export GAZEBO_MODEL_PATH=~/catkin_ws2/src/sensor_stick/models
-    $ source ~/catkin_ws2/devel/setup.bash
-    $ rosrun sensor_stick capture_features.py
+terminal_03
+$ cd ~/catkin_ws2
+$ export GAZEBO_MODEL_PATH=~/catkin_ws2/src/sensor_stick/models
+$ source ~/catkin_ws2/devel/setup.bash
+$ rosrun sensor_stick capture_features.py
 
-    #run in terminal_03 once capture_features.py is complete
-    rosrun sensor_stick train_svm.py
+#run in terminal_03 once capture_features.py is complete
+rosrun sensor_stick train_svm.py
     
-    Run Test in rviz
+Run Test in rviz
     
-    termincal_01
-    $roscore
+termincal_01
+$roscore
     
-    terminal_02
-    $ cd ~/catkin_ws2
-    export GAZEBO_MODEL_PATH=~/catkin_ws2/src/sensor_stick/models
-    $ source ~/catkin_ws2/devel/setup.bash
-    roslaunch sensor_stick robot_spawn.launch
+terminal_02
+$ cd ~/catkin_ws2
+export GAZEBO_MODEL_PATH=~/catkin_ws2/src/sensor_stick/models
+$ source ~/catkin_ws2/devel/setup.bash
+roslaunch sensor_stick robot_spawn.launch
     
-    terminal_03
-    $ cd ~/catkin_ws2
-    export GAZEBO_MODEL_PATH=~/catkin_ws2/src/sensor_stick/models
-    $ source ~/catkin_ws2/devel/setup.bash
-    ./object_recognition.py
-
-
+terminal_03
+$ cd ~/catkin_ws2
+export GAZEBO_MODEL_PATH=~/catkin_ws2/src/sensor_stick/models
+$ source ~/catkin_ws2/devel/setup.bash
+./object_recognition.py
 
 ### Pick and Place Setup
 
@@ -608,9 +632,8 @@ Exercise_03
 
 2- Update the proper function for exporting yaml files
 
-
-    #function to load parameters and request PickPlace service in the project_template.py
-
+```python
+#function to load parameters and request PickPlace service in the project_template.py
     def pr2_mover(object_list):
 
 
@@ -682,10 +705,12 @@ Exercise_03
         print("sent file")
 
         return
+```
 
-3- Run the Capture, Train Features, and pick list FInal Workflow for deploying the pr2 robot
+3- Run the Capture, Train Features, and pick list Final Workflow for deploying Object Recognition on the pr2 robot
 
-    Capture and Train Features based on pick list
+```sh
+Capture and Train Features based on pick list
     
     termincal_01
     $roscore
@@ -721,7 +746,7 @@ Exercise_03
     source ~/catkin_ws2/devel/setup.bash
     export GAZEBO_MODEL_PATH=~/catkin_ws2/src/RoboND-Perception-Project/pr2_robot/models:$GAZEBO_MODEL_PATH
     rosrun pr2_robot project_template.py
-
+```
 
 #### 1- test for output_1 [ 3/3 ]
 
