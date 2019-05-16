@@ -3,6 +3,12 @@
 
 ### Exercise 1, 2 and 3 pipeline implemented
 
+```sh
+$ mkdir -p ~/catkin_ws/src
+$ cd ~/catkin_ws/
+$ catkin_make
+```
+
 
 #### 1. Complete Exercise 1 steps. Pipeline for filtering and RANSAC plane fitting implemented.
 
