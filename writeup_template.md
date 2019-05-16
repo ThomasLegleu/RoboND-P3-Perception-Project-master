@@ -586,9 +586,10 @@ scaler = model['scaler']
 
 #### Instructions For Running On Ubuntu Machine Terminal: Exercise_03 
 
-```sh
+
 Capture and Train Features
-    
+
+```sh
 termincal_01
 $roscore
 
@@ -623,7 +624,7 @@ $ cd ~/catkin_ws2
 export GAZEBO_MODEL_PATH=~/catkin_ws2/src/sensor_stick/models
 $ source ~/catkin_ws2/devel/setup.bash
 ./object_recognition.py
-
+```
 ### Pick and Place Setup
 
 #### 1. For all three tabletop setups (`test*.world`), perform object recognition, then read in respective pick list (`pick_list_*.yaml`). Next construct the messages that would comprise a valid `PickPlace` request output them to `.yaml` format.
