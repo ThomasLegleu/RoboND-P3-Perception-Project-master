@@ -18,85 +18,91 @@ $ catkin_make
 
 #### Load Point Cloud file
 
-    ```python
-    cloud = pcl.load_XYZRGB('tabletop.pcd')
-    ```
+```python
+cloud = pcl.load_XYZRGB('tabletop.pcd')
+```
     
 #### a- Voxel Grid filter
 
 ![alt text](images/01_voxel_DownSample_0.005.PNG)
 
+```python
+# Create a VoxelGrid filter object for our input point cloud
+vox = cloud.make_voxel_grid_filter()
 
-    # Create a VoxelGrid filter object for our input point cloud
-    vox = cloud.make_voxel_grid_filter()
+# Choose a voxel (also known as leaf) size
+LEAF_SIZE = 0.01   
 
-    # Choose a voxel (also known as leaf) size
-    LEAF_SIZE = 0.01   
-
-    # Set the voxel (or leaf) size  
-    vox.set_leaf_size(LEAF_SIZE, LEAF_SIZE, LEAF_SIZE)
+# Set the voxel (or leaf) size  
+vox.set_leaf_size(LEAF_SIZE, LEAF_SIZE, LEAF_SIZE)
     
-    # Call the filter function to obtain the resultant downsampled point cloud
-    cloud_filtered = vox.filter()
-    filename = 'voxel_downsampled.pcd'
-    pcl.save(cloud_filtered, filename)
+# Call the filter function to obtain the resultant downsampled point cloud
+cloud_filtered = vox.filter()
+filename = 'voxel_downsampled.pcd'
+pcl.save(cloud_filtered, filename)
+```
 
 
 #### b- PassThrough filter
 
 ![alt text](images/02_pass_throughfilter.PNG)
 
-    # PassThrough filter
-    # Create a PassThrough filter object.
-    passthrough = cloud_filtered.make_passthrough_filter()
+```python
+# PassThrough filter
+# Create a PassThrough filter object.
+passthrough = cloud_filtered.make_passthrough_filter()
 
-    # Assign axis and range to the passthrough filter object.
-    filter_axis = 'z'
-    passthrough.set_filter_field_name(filter_axis)
-    axis_min = 0.6
-    axis_max = 1.1
-    passthrough.set_filter_limits(axis_min, axis_max)
+# Assign axis and range to the passthrough filter object.
+filter_axis = 'z'
+passthrough.set_filter_field_name(filter_axis)
+axis_min = 0.6
+axis_max = 1.1
+passthrough.set_filter_limits(axis_min, axis_max)
 
-    # Finally use the filter function to obtain the resultant point cloud. 
-    cloud_filtered = passthrough.filter()
-    filename = 'pass_through_filtered.pcd'
-    pcl.save(cloud_filtered, filename)
+# Finally use the filter function to obtain the resultant point cloud. 
+cloud_filtered = passthrough.filter()
+filename = 'pass_through_filtered.pcd'
+pcl.save(cloud_filtered, filename)
+```
 
 #### c- RANSAC plane segmentation // Extract inliers
 
 ![alt text](images/03_RANSAC_Extracting_inliers.PNG)
 
-    # Create the segmentation object
-    seg = cloud_filtered.make_segmenter()
+```python
+# Create the segmentation object
+seg = cloud_filtered.make_segmenter()
 
-    # Set the model you wish to fit 
-    seg.set_model_type(pcl.SACMODEL_PLANE)
-    seg.set_method_type(pcl.SAC_RANSAC)
+# Set the model you wish to fit 
+seg.set_model_type(pcl.SACMODEL_PLANE)
+seg.set_method_type(pcl.SAC_RANSAC)
 
-    # Max distance for a point to be considered fitting the model
-    # Experiment with different values for max_distance 
-    # for segmenting the table
-    max_distance = 0.04
-    seg.set_distance_threshold(max_distance)
+# Max distance for a point to be considered fitting the model
+# Experiment with different values for max_distance 
+# for segmenting the table
+max_distance = 0.04
+seg.set_distance_threshold(max_distance)
 
-    # Call the segment function to obtain set of inlier indices and model coefficients
-    inliers, coefficients = seg.segment()
+# Call the segment function to obtain set of inlier indices and model coefficients
+inliers, coefficients = seg.segment()
 
-    extracted_inliers = cloud_filtered.extract(inliers, negative=False)
-    filename = 'extracted_inliers.pcd'
-    pcl.save(extracted_inliers, filename)
+extracted_inliers = cloud_filtered.extract(inliers, negative=False)
+filename = 'extracted_inliers.pcd'
+pcl.save(extracted_inliers, filename)
 
-    # Save pcd for table
-    #pcl.save(cloud, filename)
+# Save pcd for table
+#pcl.save(cloud, filename)
+```
 
 #### d-Extract outliers
 
 ![alt text](images/04_RANSAC_Extracting_outliers.PNG) 
-    
-    extracted_outliers = cloud_filtered.extract(inliers, negative=True)
-    filename = 'extracted_outliers.pcd'
-    pcl.save(extracted_outliers, filename)
-    
+ 
+```python
+extracted_outliers = cloud_filtered.extract(inliers, negative=True)
+filename = 'extracted_outliers.pcd'
+pcl.save(extracted_outliers, filename)
+```    
 
 #### 2. Complete Exercise 2 steps: Pipeline including clustering for segmentation implemented.  
 
@@ -105,20 +111,25 @@ The goal is to write a ROS node that takes in the camera data as a point cloud, 
 #### A- publish the point cloud:
 
 
-
 ROS node initialization
 
+    ```python
     rospy.init_node('clustering', anonymous=True)
+    ```
     
 Create Subscribers
 
+    ```python
     pcl_sub = rospy.Subscriber("/sensor_stick/point_cloud", pc2.PointCloud2, pcl_callback, queue_size=1)
+    ```
     
 Create Publishers
 
-    pcl_objects_pub = rospy.Publisher("/pcl_objects", PointCloud2, queue_size=1)
-    pcl_table_pub = rospy.Publisher("/pcl_table", PointCloud2, queue_size=1)
-    
+```python
+pcl_objects_pub = rospy.Publisher("/pcl_objects", PointCloud2, queue_size=1)
+pcl_table_pub = rospy.Publisher("/pcl_table", PointCloud2, queue_size=1)
+```
+
 Spin while node is not shutdown
 
     while not rospy.is_shutdown():
@@ -126,8 +137,10 @@ Spin while node is not shutdown
     
 Publish ROS msg
 
-    pcl_objects_pub.publish(pcl_msg)
-    pcl_table_pub.publish(pcl_msg)
+```python
+pcl_objects_pub.publish(pcl_msg)
+pcl_table_pub.publish(pcl_msg)
+```
 
 ![alt text](images/05_rviz_gazebo_setup.PNG)
 
@@ -141,17 +154,23 @@ Publish ROS msg
 
 Convert ROS msg to PCL data
 
-    cloud = ros_to_pcl(pcl_msg)
-
+```python
+cloud = ros_to_pcl(pcl_msg)
+```
+    
 Convert PCL data to ROS msg
 
-    ros_cloud_objects = pcl_to_ros(extracted_outliers) 
-    ros_cloud_table = pcl_to_ros(extracted_inliers)
-    
+```python
+ros_cloud_objects = pcl_to_ros(extracted_outliers) 
+ros_cloud_table = pcl_to_ros(extracted_inliers)
+```
+
 Publish ROS msg
 
-    pcl_objects_pub.publish(ros_cloud_objects)
-    pcl_table_pub.publish(ros_cloud_table) 
+```python
+pcl_objects_pub.publish(ros_cloud_objects)
+pcl_table_pub.publish(ros_cloud_table) 
+```
     
 Inliers and Outliers shown in ROS
     
@@ -173,25 +192,26 @@ To construct a k-d tree
 
 Euclidean Clustering with a k-d tree and pcl//ROS
 
-    white_cloud = XYZRGB_to_XYZ(extracted_outliers)# Apply function to convert XYZRGB to XYZ
-    tree = white_cloud.make_kdtree()
+```python
+white_cloud = XYZRGB_to_XYZ(extracted_outliers)# Apply function to convert XYZRGB to XYZ
+tree = white_cloud.make_kdtree()
 
-    # TODO: Create Cluster-Mask Point Cloud to visualize each cluster separately ///////
-    ec = white_cloud.make_EuclideanClusterExtraction()
+# TODO: Create Cluster-Mask Point Cloud to visualize each cluster separately ///////
+ec = white_cloud.make_EuclideanClusterExtraction()
 
-    # Set tolerances for distance threshold 
-    # as well as minimum and maximum cluster size (in points)
-    # Your task is to experiment and find values that work for segmenting objects.
-    ec.set_ClusterTolerance(0.05)
-    ec.set_MinClusterSize(10)
-    ec.set_MaxClusterSize(2500)
+# Set tolerances for distance threshold 
+# as well as minimum and maximum cluster size (in points)
+# Your task is to experiment and find values that work for segmenting objects.
+ec.set_ClusterTolerance(0.05)
+ec.set_MinClusterSize(10)
+ec.set_MaxClusterSize(2500)
 
-    # Search the k-d tree for clusters
-    ec.set_SearchMethod(tree)
+# Search the k-d tree for clusters
+ec.set_SearchMethod(tree)
    
-    # Extract indices for each of the discovered clusters
-    cluster_indices = ec.Extract()
-    
+# Extract indices for each of the discovered clusters
+cluster_indices = ec.Extract()
+```
 
 Choosing a unique color for each segmented Object called cluster cloud 
 
